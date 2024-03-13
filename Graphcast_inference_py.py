@@ -204,10 +204,9 @@ print(f"Updated Grid2Mesh Edge Features Shape: {eg2m_updated.shape}")
 
 
 class message_pass(nn.Module):
- 
-    def __init__(self,mesh_nodes,mesh_edges):
-     
+     def __init__(self,mesh_nodes,mesh_edges):
         super(message_pass,self).__init__()
+     
         self.adj_mat=torch.randint(high=2, size=(mesh_nodes, mesh_edges)).float()
         print("matrix for message passing:Row(Node) * Column(Edge)=",self.adj_mat)
         print("message passing matrix has shape=",self.adj_mat.shape)
@@ -220,10 +219,9 @@ class message_pass(nn.Module):
      
      
 class Mesh_GNN(nn.Module):
- 
-    def __init__(self,mesh_edge_features,mesh_node_features,mesh_hidden_dim):
-     
+     def __init__(self,mesh_edge_features,mesh_node_features,mesh_hidden_dim):
         super(Mesh_GNN, self).__init__()
+     
         # MLP for updating mesh edge features 
         self.em_MLP = MLP(embed_feature_latent_dim*3,mesh_hidden_dim)
         
