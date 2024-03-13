@@ -6,5 +6,7 @@ configure() function has not been used to input variable sizes. Instead the vari
 
 e.g., real value: 103200, modified value : 10 #3200
 
-Run code :
-~'''python Graphcast_inference_py.py'''
+# Run code :
+```python 
+python Graphcast_inference_py.py
+```
