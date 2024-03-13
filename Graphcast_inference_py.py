@@ -208,8 +208,8 @@ class message_pass(nn.Module):
         super(message_pass,self).__init__()
      
         self.adj_mat=torch.randint(high=2, size=(mesh_nodes, mesh_edges)).float()
-        print("matrix for message passing:Row(Node) * Column(Edge)=",self.adj_mat)
-        print("message passing matrix has shape=",self.adj_mat.shape)
+        print("matrix for message passing in processor:Row(Node) * Column(Edge)=",self.adj_mat)
+        print("message passing matrix of processor has shape=",self.adj_mat.shape)
      
      def forward(self,em_updated,vm_updated):
      
