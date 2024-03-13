@@ -136,19 +136,6 @@ class Grid2MeshGNN(nn.Module):
 
         return vg_embed_final, vm_embed_final, eg2m_embed_final
 
-#define the message passing using modified version of adjancency matrix
-  ## the modified adjacency matrix's row indices are mesh_node indices and column indices are mesh_edge indices
-  ## summed feature of neighbouring edges for all mesh_nodes=adj_matrix * mesh_edge feature matrix
-class message_pass(nn.Module):
-  def __init__(self,mesh_nodes,mesh_edges):
-    super(message_pass,self).__init__()
-    self.adj_mat=torch.randint(high=2, size=(mesh_nodes, mesh_edges)).float()
-    print("matrix for message passing:Row(Node) * Column(Edge)=",self.adj_mat)
-    print("message passing matrix has shape=",self.adj_mat.shape)
-  def forward(self,em_updated,vm_updated):
-    edge_sum= torch.matmul(self.adj_mat,em_updated)
-    vm_processor=torch.cat((vm_updated,edge_sum),dim=1)
-    return vm_processor
 
 """# ***Encoder oparations:***"""
 
@@ -210,8 +197,32 @@ print(f"Updated Grid2Mesh Edge Features Shape: {eg2m_updated.shape}")
 * **I have skipped these calculations for brevity of the code. Also, I consider that, I have just 1 mesh, so the following operations are performed once and not in loops. Information of neighbours of a node are not generated using geometry of icosahedron. Instead they are randomly generated**.
 """
 
+
+#define the message passing using modified version of adjancency matrix
+    ## the modified adjacency matrix's row indices are mesh_node indices and column indices are mesh_edge indices
+    ## summed feature of neighbouring edges for all mesh_nodes=adj_matrix * mesh_edge feature matrix
+
+
+class message_pass(nn.Module):
+ 
+    def __init__(self,mesh_nodes,mesh_edges):
+     
+        super(message_pass,self).__init__()
+        self.adj_mat=torch.randint(high=2, size=(mesh_nodes, mesh_edges)).float()
+        print("matrix for message passing:Row(Node) * Column(Edge)=",self.adj_mat)
+        print("message passing matrix has shape=",self.adj_mat.shape)
+     
+    def forward(self,em_updated,vm_updated):
+     
+        edge_sum= torch.matmul(self.adj_mat,em_updated)
+        vm_processor=torch.cat((vm_updated,edge_sum),dim=1)
+        return vm_processor
+     
+     
 class Mesh_GNN(nn.Module):
+ 
     def __init__(self,mesh_edge_features,mesh_node_features,mesh_hidden_dim):
+     
         super(Mesh_GNN, self).__init__()
         # MLP for updating mesh edge features 
         self.em_MLP = MLP(embed_feature_latent_dim*3,mesh_hidden_dim)
@@ -221,6 +232,7 @@ class Mesh_GNN(nn.Module):
 
 
     def forward(self,vm_updated,em_embedded,mesh_nodes,mesh_edges):
+     
         # create a torch tensor containing infor about source and destination mesh node number for all mesh edges
         ## position of each column of tensor: index of mesh edge
         ## first row of the torch tensor: index of source mesh node
