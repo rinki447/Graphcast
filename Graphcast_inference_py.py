@@ -210,34 +210,44 @@ print(f"Updated Grid2Mesh Edge Features Shape: {eg2m_updated.shape}")
 * **I have skipped these calculations for brevity of the code. Also, I consider that, I have just 1 mesh, so the following operations are performed once and not in loops. Information of neighbours of a node are not generated using geometry of icosahedron. Instead they are randomly generated**.
 """
 
-# create a torch tensor containing infor about source and destination mesh node number for all mesh edges
-  ## position of each column of tensor: index of mesh edge
-  ## first row of the torch tensor: index of source mesh node
-  ## second row of the torch tensor: index of destination mesh node
-mesh_edge_indices = torch.randint(high=mesh_nodes, size=(2, mesh_edges))
+class Mesh_GNN(nn.Module):
+    def __init__(self,mesh_edge_features,mesh_node_features,mesh_hidden_dim):
+        super(Mesh_GNN, self).__init__()
+        # MLP for updating mesh edge features 
+        self.em_MLP = MLP(embed_feature_latent_dim*3,mesh_hidden_dim)
+        
+        # MLP for updating mesh node features
+        self.vm_MLP = MLP(embed_feature_latent_dim*2,mesh_hidden_dim)
 
 
-#updates each of the mesh edges using information of the adjacent mesh nodes
-vm_source=vm_updated[mesh_edge_indices[0, :]]
-vm_dst=vm_updated[mesh_edge_indices[1, :]]
+    def forward(self,vm_updated,em_embedded,mesh_nodes,mesh_edges):
+        # create a torch tensor containing infor about source and destination mesh node number for all mesh edges
+        ## position of each column of tensor: index of mesh edge
+        ## first row of the torch tensor: index of source mesh node
+        ## second row of the torch tensor: index of destination mesh node
+        mesh_edge_indices = torch.randint(high=mesh_nodes, size=(2, mesh_edges))
 
-em_processor=torch.cat((em_embedded,vm_source,vm_dst),dim=1)
-input_shape=em_processor.shape[1]
 
-em_MLP=MLP(input_shape,mesh_hidden_dim)
-em_updated=em_MLP(em_processor)
+        #updates each of the mesh edges using information of the adjacent mesh nodes
+        vm_source=vm_updated[mesh_edge_indices[0, :]]
+        vm_dst=vm_updated[mesh_edge_indices[1, :]]
 
-#updates each of the mesh nodes, aggregating information from all of the edges arriving at that mesh node
-GNN_part1=message_pass(mesh_nodes,mesh_edges)
-vm_changed = GNN_part1(em_updated, vm_updated)
+        em_processor=torch.cat((em_embedded,vm_source,vm_dst),dim=1)
 
-in_shape=vm_changed.shape[1]
-GNN_part2=MLP(in_shape,mesh_hidden_dim)
-vm_new=GNN_part2(vm_changed)
+        em_new=self.em_MLP(em_processor)
 
+        #updates each of the mesh nodes, aggregating information from all of the edges arriving at that mesh node
+        GNN_part1=message_pass(mesh_nodes,mesh_edges)
+        vm_changed = GNN_part1(em_new, vm_updated)
+
+        vm_new=self.vm_MLP(vm_changed)
+
+        return vm_new,em_new
+     
 # the representations are updated with a residual connection
+Mesh=Mesh_GNN(mesh_edge_features,mesh_node_features,mesh_hidden_dim)
+vm_new,em_new=Mesh(vm_updated,em_embedded,mesh_nodes,mesh_edges)
 vm_final=vm_updated+vm_new
-em_final=em_updated+em_updated
-
+em_final=em_embedded+em_new
 print("After processor, mesh node shape =",vm_final.shape)
 print("After processor, mesh edge shape =",em_final.shape)
