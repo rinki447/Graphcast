@@ -60,9 +60,9 @@ class MLP(nn.Module):
 
         return self.layers(x)
 
-class Encoder(nn.Module):
+class Embedder(nn.Module):
     def __init__(self):
-        super(Encoder, self).__init__()
+        super(Embedder, self).__init__()
 
         # Define MLPs for each feature type
         self.mlp_grid_node = MLP(grid_node_features, embed_feature_latent_dim)
@@ -82,15 +82,15 @@ class Encoder(nn.Module):
         return vg_embedded, vm_embedded, em_embedded, eg2m_embedded, em2g_embedded
 
 # Define the Grid2MeshGNN module
-class Grid2MeshGNN(nn.Module):
+class Grid2Mesh(nn.Module):
     def __init__(self, embed_feature_latent_dim, grid_hidden_dim, mesh_hidden_dim, edge_hidden_dim):
-        super(Grid2MeshGNN, self).__init__()
+        super(Grid2Mesh, self).__init__()
         # MLP for updating grid-to-mesh edge features which takes concatenated features of a grid node, a mesh node, and the edge as input
-        ## This is used as a substitute for a GNN library for simplicity
+        
         self.edge_update_mlp = MLP(embed_feature_latent_dim *3, edge_hidden_dim)
 
         # MLP for updating mesh node features which processes the aggregated edge features and the original mesh nodefeatures
-        ## This is also used as a substitute for a GNN library for simplicity as above
+        
         self.mesh_node_update_mlp = MLP(embed_feature_latent_dim+mesh_hidden_dim, mesh_hidden_dim)
 
         # MLP for updating grid node features (aggregation not added)
@@ -152,7 +152,7 @@ em2g = torch.randn(mesh2grid_edge, mesh2grid_edge_features)
 
 #Encoder operations:
 
-encoder = Encoder()
+encoder = Embedder()
 
 ## One dummy forward pass through Encoder
 vg_embedded, vm_embedded, em_embedded, eg2m_embedded, em2g_embedded = encoder(vg, vm, em, eg2m, em2g)
@@ -178,7 +178,7 @@ edge_indices_g2m = torch.cat((edge_grid_source, edge_mesh_dst), dim=0)
 
 
 # Instantiate the Grid2MeshGNN model
-grid2mesh_gnn = Grid2MeshGNN(embed_feature_latent_dim,grid_hidden_dim, mesh_hidden_dim, edge_hidden_dim)
+grid2mesh_gnn = Grid2Mesh(embed_feature_latent_dim,grid_hidden_dim, mesh_hidden_dim, edge_hidden_dim)
 
 # Use outputs from Encoder and perform forward pass through the GNN to Update features using the Grid2MeshGNN
 vg_updated, vm_updated, eg2m_updated = grid2mesh_gnn(vg_embedded, vm_embedded, eg2m_embedded, edge_indices_g2m)
