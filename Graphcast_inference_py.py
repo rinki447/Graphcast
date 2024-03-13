@@ -211,7 +211,7 @@ class message_pass(nn.Module):
         print("matrix for message passing:Row(Node) * Column(Edge)=",self.adj_mat)
         print("message passing matrix has shape=",self.adj_mat.shape)
      
-    def forward(self,em_updated,vm_updated):
+     def forward(self,em_updated,vm_updated):
      
         edge_sum= torch.matmul(self.adj_mat,em_updated)
         vm_processor=torch.cat((vm_updated,edge_sum),dim=1)
@@ -229,7 +229,7 @@ class Mesh_GNN(nn.Module):
         self.vm_MLP = MLP(embed_feature_latent_dim*2,mesh_hidden_dim)
 
 
-    def forward(self,vm_updated,em_embedded,mesh_nodes,mesh_edges):
+     def forward(self,vm_updated,em_embedded,mesh_nodes,mesh_edges):
      
         # create a torch tensor containing infor about source and destination mesh node number for all mesh edges
         ## position of each column of tensor: index of mesh edge
