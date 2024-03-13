@@ -14,7 +14,7 @@ configure() function has not been used to input variable sizes. Instead the vari
 
 e.g.,
 real value: 103200,
-modified value : 10 #320
+modified value : 10 #3200
 """
 
 import torch
