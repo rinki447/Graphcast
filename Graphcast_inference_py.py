@@ -253,9 +253,12 @@ def main():
     print(f"Updated Mesh Node Features Shape: {vm_updated.shape}")
     print(f"Updated Grid2Mesh Edge Features Shape: {eg2m_updated.shape}")
     
-    # the representations are updated with a residual connectionMesh=Mesh_GNN(mesh_edge_features,mesh_node_features,mesh_hidden_dim)vm_new,em_new=Mesh(vm_updated,em_embedded,mesh_nodes,mesh_edges)vm_final=vm_updated+vm_newem_final=em_embedded+em_newprint("After processor, mesh node shape =",vm_final.shape)print("After processor, mesh edge shape =",em_final.shape)
+    #Processor message passing:
 
+    ## Initialize the Mesh GNN
     Mesh=Mesh_GNN(mesh_edge_features,mesh_node_features,mesh_hidden_dim,embed_feature_latent_dim)
+
+    ## Forward pass and update the mesh nodes features and mesh edge features
     vm_new,em_new=Mesh(vm_updated,em_embedded,mesh_nodes,mesh_edges)
     vm_final=vm_updated+vm_new
     em_final=em_embedded+em_new
