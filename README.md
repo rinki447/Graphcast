@@ -10,3 +10,7 @@ e.g., real value: 103200, modified value : 10 #3200
 ```python 
 python Graphcast_inference_py.py
 ```
+or to understand the partwise operation, we also created different .py files in lib folder and you can check main.py to understand how those functions are called
+```python 
+python main.py
+```
