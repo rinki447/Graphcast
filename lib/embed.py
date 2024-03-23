@@ -1,6 +1,6 @@
 import torch
 import torch.nn as nn
-from mlp import MLP
+from lib.mlp import MLP
 
 class Embedder(nn.Module):
     def __init__(self,grid_node_features,embed_feature_latent_dim,mesh_node_features,
