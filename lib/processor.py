@@ -1,6 +1,6 @@
 import torch
 import torch.nn as nn
-from mlp import MLP
+from lib.mlp import MLP
 
 class message_pass(nn.Module):
     def __init__(self,mesh_nodes,mesh_edges):
