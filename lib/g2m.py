@@ -1,6 +1,6 @@
 import torch
 import torch.nn as nn
-from mlp import MLP
+from lib.mlp import MLP
 
 # Define the Grid2MeshGNN module
 class Grid2Mesh(nn.Module):
